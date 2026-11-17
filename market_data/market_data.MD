@@ -11,6 +11,5 @@
 ### Phase 1 — Domain model
 Create. Document bid <= ask and positive prices. Publish a supplied quote; no randomness yet. Quote {symbol, bid, ask, sequence}
 
-
 ### Phase 2 — Subscriptions
 Implement subscribe(std::function<void(const Quote&)>) returning an ID and publish(Quote). Support multiple lambda subscribers.
