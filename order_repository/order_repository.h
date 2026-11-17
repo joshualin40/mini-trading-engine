@@ -27,14 +27,13 @@ struct Order {
 class OrderRepository {
     public: 
         bool insert(const Order& order);
-        std::optional<size_t> find(const Order& order) const;
+        std::optional<size_t> find(OrderId orderid) const;
+        bool erase(OrderId orderid); 
         std::vector<Order> all() const; 
         
-
     private: 
         bool validate_insert(const Order& order) const; 
-        bool validate_find(const Order& order) const; 
 
         std::vector<Order> storage; 
-        std::unordered_map<OrderId, size_t> lookup; // map to index
+        std::unordered_map<OrderId, size_t> lookup; // map OrderIds to index
 };

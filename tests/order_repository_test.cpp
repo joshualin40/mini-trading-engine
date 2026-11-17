@@ -24,13 +24,44 @@ TEST(order_repository_test, test_find) {
     repo.insert(order2); 
 
     // finding valid orders
-    ASSERT_TRUE(repo.find(order1).has_value()); 
-    ASSERT_EQ(*(repo.find(order1)), 0); 
-    ASSERT_TRUE(repo.find(order2).has_value()); 
-    ASSERT_EQ(*(repo.find(order2)), 1); 
+    ASSERT_TRUE(repo.find(1).has_value()); 
+    ASSERT_EQ(*(repo.find(1)), 0); 
+    ASSERT_TRUE(repo.find(2).has_value()); 
+    ASSERT_EQ(*(repo.find(2)), 1); 
 
     // finding invalid orders
-    ASSERT_FALSE(repo.find(Order{"APPL", 3, Side::BUY, 40, 3}).has_value()); // invalid order_id
-    ASSERT_FALSE(repo.find(Order{"APPL", 2, Side::BUY, 80, 90}).has_value()); // valid order_id but doesn't match
+    ASSERT_FALSE(repo.find(3).has_value()); // invalid order_id
 }
 
+TEST(order_repository_test, test_erase) {
+    OrderRepository repo; 
+
+    Order order1{"APPL", 1, Side::BUY, 40, 3}; 
+    Order order2{"APPL", 2, Side::BUY, 40, 3}; 
+    Order order3{"APPL", 3, Side::BUY, 40, 3}; 
+    repo.insert(order1); 
+    repo.insert(order2); 
+    repo.insert(order3); 
+
+    // 1 2 3
+    // remove front
+    repo.erase(1); 
+    ASSERT_FALSE(repo.find(1).has_value()); 
+    // add to back
+    repo.insert(order1); 
+    ASSERT_EQ(repo.find(1).value(), 2); 
+
+    // 2 3 1
+    // remove middle 
+    repo.erase(3); 
+    ASSERT_FALSE(repo.find(3).has_value()); 
+    // add back
+    repo.insert(order3); 
+    // 2 1 3
+    ASSERT_EQ(repo.find(3).value(), 2); 
+
+    // 2 1 3
+    // remove back 
+    repo.erase(3); 
+    ASSERT_FALSE(repo.find(3).has_value()); 
+}
