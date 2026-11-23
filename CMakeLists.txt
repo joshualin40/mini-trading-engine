@@ -7,6 +7,7 @@ add_executable(mini_trading_system
     tests/market_data_test.cpp
     order_repository/order_repository.cpp
     tests/order_repository_test.cpp
+    tests/test_risk_manager.cpp
 )
 
 target_link_libraries(mini_trading_system gtest_main)

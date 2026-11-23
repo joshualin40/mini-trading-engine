@@ -1,39 +1,82 @@
-#include <vector> 
-#include <string> 
-#include <exception> 
+#include <list>
+#include <string>
+#include <exception>
 #include <unordered_map>
 #include <cstdint>
-#include <optional> 
+#include <optional>
 
-using OrderId = uint64_t; 
-using Quantity = uint64_t; 
-using Price = uint64_t; 
+using OrderId = uint64_t;
+using Quantity = uint64_t;
+using Price = uint64_t;
 
-enum class Side {
+enum class Side
+{
     BUY,
     SELL
-}; 
+};
 
-struct Order {
-    std::string symbol; 
-    OrderId order_id; 
-    Side side; 
-    Price price; 
+struct Order
+{
+    OrderId order_id;
+    std::string symbol;
+    Side side;
+    Price price;
     Quantity quantity;
 
-    bool operator==(const Order&) const = default;
-}; 
+    Order(OrderId order_id_, const std::string symbol_, Side side_, Price price_, Quantity quantity_)
+        : order_id(order_id_)
+        , symbol(symbol_)
+        , side(side_)
+        , price(price_)
+        , quantity(quantity_) {}
 
-class OrderRepository {
-    public: 
-        bool insert(const Order& order);
-        std::optional<size_t> find(OrderId orderid) const;
-        bool erase(OrderId orderid); 
-        std::vector<Order> all() const; 
-        
-    private: 
-        bool validate_insert(const Order& order) const; 
+    Order(const Order &other)
+        : symbol((other.symbol))
+        , order_id((other.order_id))
+        , side((other.side))
+        , price((other.price))
+        , quantity((other.quantity)) {}
 
-        std::vector<Order> storage; 
-        std::unordered_map<OrderId, size_t> lookup; // map OrderIds to index
+    Order &operator=(Order &other)
+    {
+        symbol = (other.symbol);
+        order_id = (other.order_id);
+        side = other.side;
+        price = (other.price);
+        quantity = (other.quantity);
+
+        return *this;
+    }
+    Order(Order &&other) noexcept
+        : order_id(std::move(other.order_id)), symbol(std::move(other.symbol)), side(std::move(other.side)), price(std::move(other.price)), quantity(std::move(other.quantity)) {}
+
+    Order &operator=(Order &&other) noexcept
+    {
+        order_id = (std::move(other.order_id));
+        symbol = (std::move(other.symbol));
+        side = (std::move(other.side));
+        price = (std::move(other.price));
+        quantity = (std::move(other.quantity));
+
+        return (*this);
+    }
+    bool operator==(const Order &other) const = default;
+};
+
+using OrderIterator = std::list<Order>::iterator;
+using OptionalOrderIterator = std::optional<OrderIterator>;
+
+class OrderRepository
+{
+public:
+    bool insert(const Order &order);
+    OptionalOrderIterator find(OrderId orderid) const;
+    bool erase(OrderId orderid);
+    std::list<Order> all() const;
+
+private:
+    bool validate_insert(const Order &order) const;
+
+    std::list<Order> m_storage;
+    std::unordered_map<OrderId, OrderIterator> m_lookup; // map OrderId to to list iterator
 };

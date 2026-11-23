@@ -5,46 +5,39 @@ bool OrderRepository::insert(const Order& order) {
     if (!validate_insert(order)) 
         return false; 
 
-    lookup[order.order_id] = storage.size(); 
-    storage.push_back(order); 
+    m_storage.push_back(order); 
+    m_lookup[order.order_id] = std::prev(m_storage.end()); 
+    
 
     return true; 
 }
 
-std::optional<size_t> OrderRepository::find(OrderId orderid) const {
-    if (!lookup.contains(orderid)) 
+OptionalOrderIterator OrderRepository::find(OrderId orderid) const {
+    if (!m_lookup.contains(orderid)) 
         return std::nullopt; 
     
     // use .at() since [] is non-const
-    return lookup.at(orderid); 
+    return m_lookup.at(orderid); 
 }
 
-std::vector<Order> OrderRepository::all() const {
-    return storage; 
+std::list<Order> OrderRepository::all() const {
+    return m_storage; 
 }
 
 bool OrderRepository::erase(OrderId orderid) {
-    if (!lookup.contains(orderid))
+    if (!m_lookup.contains(orderid))
         return false;
     
-    size_t erase_index = lookup[orderid]; 
-    if (erase_index == storage.size() - 1) // last element
-        storage.pop_back();
-    else {
-        OrderId back_id = storage[storage.size() - 1].order_id; 
-        lookup[back_id] = erase_index; 
-        storage[erase_index] = storage[storage.size() - 1]; 
-        storage.pop_back(); 
-    } 
-
-    lookup.erase(orderid); 
+    auto erase_itr = m_lookup[orderid]; 
+    m_storage.erase(erase_itr);
+    m_lookup.erase(orderid); 
 
     return true; 
 }
 
 // private helpers 
 bool OrderRepository::validate_insert(const Order& order) const {
-    if (order.symbol == "" || order.order_id <= 0 || order.price < 0 || order.quantity < 0 || lookup.contains(order.order_id))
+    if (order.symbol == "" || order.order_id <= 0 || order.price < 0 || order.quantity < 0 || m_lookup.contains(order.order_id))
         return false;
     
     return true; 
