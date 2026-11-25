@@ -5,9 +5,9 @@
 #include <cstdint>
 #include <optional>
 
-using OrderId = uint64_t;
-using Quantity = uint64_t;
-using Price = uint64_t;
+using OrderId   = uint64_t;
+using Quantity  = int64_t;
+using Price     = int64_t;
 
 enum class Side
 {

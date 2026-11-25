@@ -106,13 +106,14 @@ TEST(order_repository_edge_test, max_order_id_is_valid) {
 
 TEST(order_repository_edge_test, boundary_price_and_quantity) {
     OrderRepository repo;
-    constexpr uint64_t max_val = std::numeric_limits<uint64_t>::max();
+    constexpr int64_t max_quantity = std::numeric_limits<Quantity>::max(); 
+    constexpr int64_t max_price = std::numeric_limits<Price>::max();
 
-    EXPECT_TRUE(repo.insert(Order{1, "APPL", Side::BUY, max_val, 3}));
-    EXPECT_TRUE(repo.insert(Order{2, "APPL", Side::BUY, 40, max_val}));
+    EXPECT_TRUE(repo.insert(Order{1, "APPL", Side::BUY, max_price, 3}));
+    EXPECT_TRUE(repo.insert(Order{2, "APPL", Side::BUY, 40, max_quantity}));
 
-    EXPECT_EQ(repo.find(1).value()->price, max_val);
-    EXPECT_EQ(repo.find(2).value()->quantity, max_val);
+    EXPECT_EQ(repo.find(1).value()->price, max_price);
+    EXPECT_EQ(repo.find(2).value()->quantity, max_quantity);
 }
 
 TEST(order_repository_edge_test, side_is_preserved) {
@@ -248,7 +249,7 @@ TEST(order_repository_edge_test, many_inserts_and_erases_stay_consistent) {
     constexpr OrderId n = 1000;
 
     for (OrderId id = 1; id <= n; ++id)
-        ASSERT_TRUE(repo.insert(Order{id, "APPL", Side::BUY, id, id}));
+        ASSERT_TRUE(repo.insert(Order{id, "APPL", Side::BUY, static_cast<Price>(id), static_cast<Quantity>(id)}));
 
     for (OrderId id = 2; id <= n; id += 2)
         ASSERT_TRUE(repo.erase(id));

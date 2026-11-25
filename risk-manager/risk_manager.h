@@ -12,8 +12,13 @@ class SimpleRiskManager : public IRiskManager
 {
 public:
     SimpleRiskManager(Quantity maxQuantity, Price maxNotional) : 
-    m_maxQuantity(maxQuantity)
-    , m_maxNotional(maxNotional) {}
+    m_maxQuantity{maxQuantity}
+    , m_maxNotional{maxNotional} {
+        if (m_maxNotional == std::numeric_limits<Price>::infinity() || m_maxNotional <= 0)
+            throw std::invalid_argument("Invalid maxNotional.");
+        if (m_maxQuantity == std::numeric_limits<Quantity>::infinity() || m_maxQuantity <= 0) 
+            throw std::invalid_argument("Invalid maxQuantity.");
+    }
 
     // rejects malformed or oversized orders
     bool approve(const Order& order) override {
@@ -53,6 +58,20 @@ class TradingSystem {
 
         TradingSystem(const FakeRiskManager& riskmanager): 
             m_riskManager(std::make_unique<FakeRiskManager>(riskmanager)) {}
+
+        TradingSystem(SimpleRiskManager* riskmanager):
+            m_riskManager(riskmanager) {
+                std::println("Trading System Constructor");
+            }
+        
+        TradingSystem(FakeRiskManager* riskmanager):
+            m_riskManager(riskmanager) {}
+        
+        ~TradingSystem() {
+            std::println("Trading System Destructor"); 
+        }
+        // TradingSystem(SimpleRiskManager&& riskmanager):
+        //     m_riskManager(riskmanager) {}
 
         bool submit(const Order& order) {
             return m_riskManager->approve(order); 
