@@ -28,7 +28,9 @@ public:
         return true; 
     }
 
-    ~SimpleRiskManager() {}
+    ~SimpleRiskManager() {
+        std::println("SimpleRiskManager Destructor"); 
+    }
 private:
     bool validate_order(const Order &order) {
         if (order.symbol == "" || order.order_id <= 0 || order.price < 0 || order.quantity < 0)
