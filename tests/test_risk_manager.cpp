@@ -272,6 +272,7 @@ TEST(TradingSystemTest, TakesOwnershipOfRawSimpleRiskManagerPointer) {
     // No delete here: TradingSystem's unique_ptr frees it (ASan/leaks would flag otherwise).
 }
 
+
 TEST(TradingSystemTest, TakesOwnershipOfRawFakeRiskManagerPointer) {
     TradingSystem system(new FakeRiskManager());
     EXPECT_FALSE(system.submit(makeOrder()));
